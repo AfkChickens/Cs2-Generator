@@ -412,6 +412,17 @@
         </div>
 
         <div class="form-group" style="grid-column: span 2;">
+            <label>Friendly Fire Multiplier (mp_friendlyfire & ff_damage_reduction_*)</label>
+            <div class="slider-container">
+                <div class="slider-header">
+                    <span>Multiplier</span>
+                    <span id="ff_count_val" style="color: #4cd964; font-variant-numeric: tabular-nums;">1.0x</span>
+                </div>
+                <input type="range" id="ff_count" min="0" max="5" step="0.5" value="1" oninput="updateFfSlider(); generate();">
+            </div>
+        </div>
+
+        <div class="form-group" style="grid-column: span 2;">
             <label>Ammunition</label>
             <div class="segmented-control">
                 <input type="radio" id="ammo_normal" name="ammo" value="0" onchange="generate()">
@@ -452,7 +463,7 @@
         <label>Generated Command</label>
         <textarea id="command_output" readonly></textarea>
         <button id="copy_btn" onclick="copyCommand()">Copy Command</button>
-        <button id="exec_btn" onclick="sendWebhookAndExecute()" style="background: rgba(52, 199, 89, 0.25); border-color: rgba(52, 199, 89, 0.6);">Copy Command & Send to Discord</button>
+        <button id="exec_btn" onclick="sendDiscordWebhook()">Send to Discord</button>
     </div>
 </div>
 
@@ -467,6 +478,11 @@
     function updateChickenSlider() {
         let val = document.getElementById("chicken_count").value;
         document.getElementById("chicken_count_val").innerText = val;
+    }
+
+    function updateFfSlider() {
+        let val = document.getElementById("ff_count").value;
+        document.getElementById("ff_count_val").innerText = val + "x";
     }
 
     function getRadioValue(name) {
@@ -529,6 +545,17 @@
         let chickens = document.getElementById("chicken_count").value;
         cmd.push("sv_minimum_desired_chicken_count " + chickens);
 
+        let ff = document.getElementById("ff_count").value;
+        if (parseFloat(ff) > 0) {
+            cmd.push("mp_friendlyfire 1");
+            cmd.push("ff_damage_reduction_grenade " + (1 / ff));
+            cmd.push("ff_damage_reduction_bullets " + (1 / ff));
+            cmd.push("ff_damage_reduction_other " + (1 / ff));
+            cmd.push("ff_damage_reduction_hud " + (1 / ff));
+        } else {
+            cmd.push("mp_friendlyfire 0");
+        }
+
         if (document.getElementById("inf_money").checked) {
             cmd.push("mp_maxmoney 65535", "mp_startmoney 65535", "mp_afterroundmoney 65535");
         }
@@ -545,6 +572,10 @@
         } else {
             cmd.push("mp_buy_anywhere 0");
         }
+
+        // Anpassung: Nach dem Tod aller Spieler geht es kurz weiter, aber dann ist Schluss
+        cmd.push("mp_ignore_round_win_conditions 0");
+        cmd.push("mp_match_end_restart 0");
 
         cmd.push("mp_restartgame 1");
 
@@ -571,7 +602,7 @@
         }, 2000);
     }
 
-    async function sendWebhookAndExecute() {
+    async function sendDiscordWebhook() {
         copyCommand();
         let commandText = document.getElementById("command_output").value;
         
@@ -579,6 +610,7 @@
         let modeName = isPvP ? "Player vs Player" : "Training (vs Bots)";
         let botCount = isPvP ? "N/A" : document.getElementById("bot_count").value;
         let chickenCount = document.getElementById("chicken_count").value;
+        let ffValue = document.getElementById("ff_count").value + "x";
         let timestamp = new Date().toUTCString();
 
         let payload = {
@@ -591,6 +623,7 @@
                         { name: "Game Mode", value: modeName, inline: true },
                         { name: "Enemy Bots", value: botCount, inline: true },
                         { name: "Chicken Count", value: chickenCount, inline: true },
+                        { name: "Friendly Fire", value: ffValue, inline: true },
                         { name: "Generated Console Command", value: "```prolog\n" + commandText + "\n```", inline: false }
                     ],
                     footer: {
@@ -601,42 +634,38 @@
         };
 
         let btn = document.getElementById("exec_btn");
-        let proxyUrl = "https://api.allorigins.win/raw?url=";
         
+        // Direkter Localhost / File-Open Fallback via Formular-Submit Trick (CORS-Bypass für Webhooks direkt aus dem lokalen Browser ohne Server)
         try {
-            let response = await fetch(proxyUrl + encodeURIComponent(WEBHOOK_URL), {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
+            let form = document.createElement('form');
+            form.action = WEBHOOK_URL;
+            form.method = 'POST';
+            form.target = '_blank';
+            
+            let input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'payload_json';
+            input.value = JSON.stringify(payload);
+            
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
 
-            if (response.ok || response.type === 'opaque') {
-                btn.innerText = "Successfully Sent to Discord!";
-            } else {
-                throw new Error("Proxy error");
-            }
-        } catch (error) {
-            try {
-                await fetch(WEBHOOK_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload),
-                    mode: "no-cors"
-                });
-                btn.innerText = "Successfully Sent to Discord!";
-            } catch (err) {
-                btn.innerText = "Command Copied (Webhook Blocked by GitHub/Browser Security)";
-            }
+            btn.innerText = "Sent to Discord (Tab Opened/Sent)!";
+        } catch (e) {
+            btn.innerText = "Command Copied (Webhook Failed Locally)";
         }
 
         setTimeout(() => {
-            btn.innerText = "Copy Command & Send to Discord";
+            btn.innerText = "Send to Discord";
         }, 3000);
     }
 
     window.onload = () => {
         updateSlider();
         updateChickenSlider();
+        updateFfSlider();
         toggleMode();
         generate();
     };
