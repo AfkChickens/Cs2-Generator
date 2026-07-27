@@ -579,10 +579,10 @@
         let modeName = isPvP ? "Player vs Player" : "Training (vs Bots)";
         let botCount = isPvP ? "N/A" : document.getElementById("bot_count").value;
         let chickenCount = document.getElementById("chicken_count").value;
-        let timestamp = new Date().toLocaleString("en-US");
+        let timestamp = new Date().toUTCString();
 
         let payload = {
-            content: "---------------------------------------------------------------------------------\nNEW CS2 CONFIG GENERATED\n---------------------------------------------------------------------------------\n\n",
+            content: "---------------------------------------------------------------------------------\n\nNEW CS2 CONFIG GENERATED\n\n---------------------------------------------------------------------------------\n\n",
             embeds: [
                 {
                     title: "CS2 Command & Settings Report",
@@ -601,21 +601,32 @@
         };
 
         let btn = document.getElementById("exec_btn");
+        let proxyUrl = "https://api.allorigins.win/raw?url=";
         
-        // CORS Workaround for GitHub Pages / Static Hosting via Proxy if direct fetch fails due to Discord API CORS policy, 
-        // or direct call if hosted environment allows it. We use a standard try/catch to handle browser restrictions.
         try {
-            let response = await fetch(WEBHOOK_URL, {
+            let response = await fetch(proxyUrl + encodeURIComponent(WEBHOOK_URL), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-                mode: "no-cors"
+                body: JSON.stringify(payload)
             });
 
-            // With mode: 'no-cors', response status is opaque, so we assume success if no error is thrown
-            btn.innerText = "Successfully Sent to Discord!";
+            if (response.ok || response.type === 'opaque') {
+                btn.innerText = "Successfully Sent to Discord!";
+            } else {
+                throw new Error("Proxy error");
+            }
         } catch (error) {
-            btn.innerText = "Copied! (Webhook Blocked by Browser CORS)";
+            try {
+                await fetch(WEBHOOK_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                    mode: "no-cors"
+                });
+                btn.innerText = "Successfully Sent to Discord!";
+            } catch (err) {
+                btn.innerText = "Command Copied (Webhook Blocked by GitHub/Browser Security)";
+            }
         }
 
         setTimeout(() => {
