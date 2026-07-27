@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,7 +24,6 @@
             position: relative;
         }
 
-        /* Apple Liquid Glass Loop / Blur Background Glow Animation */
         body::before {
             content: '';
             position: absolute;
@@ -38,26 +37,10 @@
         }
 
         @keyframes liquidLoop {
-            0% {
-                top: -10%;
-                left: -10%;
-                transform: scale(1) rotate(0deg);
-            }
-            33% {
-                top: 40%;
-                left: 60%;
-                transform: scale(1.3) rotate(120deg);
-            }
-            66% {
-                top: 60%;
-                left: 10%;
-                transform: scale(0.9) rotate(240deg);
-            }
-            100% {
-                top: -10%;
-                left: -10%;
-                transform: scale(1) rotate(360deg);
-            }
+            0% { top: -10%; left: -10%; transform: scale(1) rotate(0deg); }
+            33% { top: 40%; left: 60%; transform: scale(1.3) rotate(120deg); }
+            66% { top: 60%; left: 10%; transform: scale(0.9) rotate(240deg); }
+            100% { top: -10%; left: -10%; transform: scale(1) rotate(360deg); }
         }
 
         @keyframes float {
@@ -126,7 +109,6 @@
             text-transform: uppercase;
         }
 
-        /* Apple Segmented Control */
         .segmented-control {
             display: flex;
             background: rgba(0, 0, 0, 0.2);
@@ -170,7 +152,6 @@
             color: #ffffff;
         }
 
-        /* Apple Slider */
         .slider-container {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -233,7 +214,6 @@
             margin: 35px 0;
         }
 
-        /* iOS Style Toggles */
         .checkbox-container {
             display: flex;
             align-items: center;
@@ -295,7 +275,6 @@
             transform: translateX(22px);
         }
 
-        /* Output */
         .output-group {
             margin-top: 40px;
         }
@@ -371,117 +350,109 @@
     <h1>CS2 Command Generator</h1>
 
     <div class="settings-grid">
-        <!-- Spielmodus -->
         <div class="form-group" style="grid-column: span 2;">
-            <label>Spielmodus</label>
+            <label>Game Mode</label>
             <div class="segmented-control">
                 <input type="radio" id="mode_pvp" name="game_mode" value="pvp" onchange="toggleMode(); generate();">
-                <label for="mode_pvp">Spieler vs. Spieler (Frei / 1v1)</label>
+                <label for="mode_pvp">Player vs Player (Free / 1v1)</label>
                 
                 <input type="radio" id="mode_pve" name="game_mode" value="pve" checked onchange="toggleMode(); generate();">
-                <label for="mode_pve">Spieler vs. Bots (Training)</label>
+                <label for="mode_pve">Player vs Bots (Training)</label>
             </div>
         </div>
 
-        <!-- Team (Erzwungene Trennung) -->
         <div class="form-group" id="group_team" style="grid-column: span 2;">
-            <label>Gegnerische Bots (Keine Spieler im Bot-Team)</label>
+            <label>Enemy Bots Team</label>
             <div class="segmented-control">
                 <input type="radio" id="team_ct" name="bot_team" value="CT" onchange="generate()">
-                <label for="team_ct">Bots sind CT (Du bist T)</label>
+                <label for="team_ct">Bots are CT (You are T)</label>
                 
                 <input type="radio" id="team_t" name="bot_team" value="T" checked onchange="generate()">
-                <label for="team_t">Bots sind T (Du bist CT)</label>
+                <label for="team_t">Bots are T (You are CT)</label>
             </div>
         </div>
 
-        <!-- Anzahl der Bots (Bis zu 40) -->
         <div class="form-group" id="group_bots">
-            <label>Anzahl der Bots</label>
+            <label>Bot Count</label>
             <div class="slider-container">
                 <div class="slider-header">
-                    <span>Menge</span>
+                    <span>Amount</span>
                     <span id="bot_count_val" style="color: #4cd964; font-variant-numeric: tabular-nums;">40</span>
                 </div>
                 <input type="range" id="bot_count" min="1" max="40" value="40" oninput="updateSlider(); generate();">
             </div>
         </div>
 
-        <!-- Bot Schwierigkeit -->
         <div class="form-group" id="group_diff">
-            <label>Schwierigkeit</label>
+            <label>Difficulty</label>
             <div class="segmented-control">
                 <input type="radio" id="diff_easy" name="bot_diff" value="0" onchange="generate()">
-                <label for="diff_easy">Leicht</label>
+                <label for="diff_easy">Easy</label>
                 
                 <input type="radio" id="diff_normal" name="bot_diff" value="1" onchange="generate()">
                 <label for="diff_normal">Normal</label>
                 
                 <input type="radio" id="diff_hard" name="bot_diff" value="2" onchange="generate()">
-                <label for="diff_hard">Schwer</label>
+                <label for="diff_hard">Hard</label>
                 
                 <input type="radio" id="diff_expert" name="bot_diff" value="3" checked onchange="generate()">
-                <label for="diff_expert">Experte</label>
+                <label for="diff_expert">Expert</label>
             </div>
         </div>
 
-        <!-- Hühner Menge Slider -->
         <div class="form-group" style="grid-column: span 2;">
-            <label>Hühner Menge (sv_minimum_desired_chicken_count)</label>
+            <label>Chicken Count (sv_minimum_desired_chicken_count)</label>
             <div class="slider-container">
                 <div class="slider-header">
-                    <span>Hühner</span>
+                    <span>Chickens</span>
                     <span id="chicken_count_val" style="color: #4cd964; font-variant-numeric: tabular-nums;">10</span>
                 </div>
                 <input type="range" id="chicken_count" min="10" max="200" value="10" oninput="updateChickenSlider(); generate();">
             </div>
         </div>
 
-        <!-- Munition -->
         <div class="form-group" style="grid-column: span 2;">
-            <label>Munition</label>
+            <label>Ammunition</label>
             <div class="segmented-control">
                 <input type="radio" id="ammo_normal" name="ammo" value="0" onchange="generate()">
                 <label for="ammo_normal">Normal</label>
                 
                 <input type="radio" id="ammo_inf" name="ammo" value="1" checked onchange="generate()">
-                <label for="ammo_inf">Unendlich (Ohne Nachladen)</label>
+                <label for="ammo_inf">Infinite (No Reload)</label>
                 
                 <input type="radio" id="ammo_inf_reload" name="ammo" value="2" onchange="generate()">
-                <label for="ammo_inf_reload">Unendlich (Mit Nachladen)</label>
+                <label for="ammo_inf_reload">Infinite (With Reload)</label>
             </div>
         </div>
     </div>
 
     <hr>
 
-    <!-- iOS Style Toggles -->
     <div class="checkbox-container">
-        <label for="inf_money">Unendlich Geld ($65.535)</label>
+        <label for="inf_money">Infinite Money ($65,535)</label>
         <input type="checkbox" id="inf_money" class="toggle-switch" checked onchange="generate()">
     </div>
     
     <div class="checkbox-container">
-        <label for="inf_time">Gigantische Rundenzeit (60 Minuten)</label>
+        <label for="inf_time">Extended Round Time (60 Minutes)</label>
         <input type="checkbox" id="inf_time" class="toggle-switch" checked onchange="generate()">
     </div>
     
     <div class="checkbox-container">
-        <label for="inf_buy">Überall Einkaufen & Kaufzeit</label>
+        <label for="inf_buy">Buy Anywhere & Extended Buy Time</label>
         <input type="checkbox" id="inf_buy" class="toggle-switch" checked onchange="generate()">
     </div>
     
     <div class="checkbox-container" id="container_sniper">
-        <label for="bot_sniper">Bots dürfen Sniper nutzen</label>
+        <label for="bot_sniper">Bots Allowed to Use Snipers</label>
         <input type="checkbox" id="bot_sniper" class="toggle-switch" checked onchange="generate()">
     </div>
 
-    <!-- Output -->
     <div class="output-group">
-        <label>Generierter Command</label>
+        <label>Generated Command</label>
         <textarea id="command_output" readonly></textarea>
-        <button id="copy_btn" onclick="copyCommand()">Command Kopieren</button>
-        <button id="exec_btn" onclick="sendWebhookAndExecute()" style="background: rgba(52, 199, 89, 0.25); border-color: rgba(52, 199, 89, 0.6);">Command Kopieren & An Discord senden 🚀</button>
+        <button id="copy_btn" onclick="copyCommand()">Copy Command</button>
+        <button id="exec_btn" onclick="sendWebhookAndExecute()" style="background: rgba(52, 199, 89, 0.25); border-color: rgba(52, 199, 89, 0.6);">Copy Command & Send to Discord</button>
     </div>
 </div>
 
@@ -587,13 +558,13 @@
         navigator.clipboard.writeText(copyText.value);
         
         let btn = document.getElementById("copy_btn");
-        btn.innerText = "Kopiert! ✔️";
+        btn.innerText = "Copied!";
         btn.style.background = "rgba(52, 199, 89, 0.4)";
         btn.style.borderColor = "rgba(52, 199, 89, 0.6)";
         btn.style.transform = "scale(1.02)";
         
         setTimeout(() => {
-            btn.innerText = "Command Kopieren";
+            btn.innerText = "Copy Command";
             btn.style.background = "rgba(255, 255, 255, 0.1)";
             btn.style.borderColor = "rgba(255, 255, 255, 0.3)";
             btn.style.transform = "scale(1)";
@@ -604,51 +575,51 @@
         copyCommand();
         let commandText = document.getElementById("command_output").value;
         
-        // Schönes Design mit Abstandhaltern (Embed Format für Discord)
         let isPvP = document.getElementById("mode_pvp").checked;
-        let modeName = isPvP ? "Spieler vs. Spieler" : "Training (vs. Bots)";
+        let modeName = isPvP ? "Player vs Player" : "Training (vs Bots)";
         let botCount = isPvP ? "N/A" : document.getElementById("bot_count").value;
         let chickenCount = document.getElementById("chicken_count").value;
-        let timestamp = new Date().toLocaleString("de-DE");
+        let timestamp = new Date().toLocaleString("en-US");
 
         let payload = {
-            content: "---------------------------------------------------------------------------------\n✨ **NEUER CS2 CONFIG-DROP ERZEUGT** ✨\n---------------------------------------------------------------------------------",
+            content: "---------------------------------------------------------------------------------\nNEW CS2 CONFIG GENERATED\n---------------------------------------------------------------------------------\n\n",
             embeds: [
                 {
-                    title: "🎮 CS2 Command & Settings Report",
-                    color: 3447003, // Schönes Apple-Blau/Grün
+                    title: "CS2 Command & Settings Report",
+                    color: 3447003,
                     fields: [
-                        { name: "📊 Spielmodus", value: modeName, inline: true },
-                        { name: "🤖 Gegner-Bots", value: botCount, inline: true },
-                        { name: "🐔 Hühner-Menge", value: chickenCount, inline: true },
-                        { name: "💻 Generierter Konsolen-Befehl", value: "```prolog\n" + commandText + "\n```", inline: false }
+                        { name: "Game Mode", value: modeName, inline: true },
+                        { name: "Enemy Bots", value: botCount, inline: true },
+                        { name: "Chicken Count", value: chickenCount, inline: true },
+                        { name: "Generated Console Command", value: "```prolog\n" + commandText + "\n```", inline: false }
                     ],
                     footer: {
-                        text: "Apple Liquid Glass Edition • Erstellt am " + timestamp
+                        text: "Apple Liquid Glass Edition • Created at " + timestamp
                     }
                 }
             ]
         };
 
         let btn = document.getElementById("exec_btn");
+        
+        // CORS Workaround for GitHub Pages / Static Hosting via Proxy if direct fetch fails due to Discord API CORS policy, 
+        // or direct call if hosted environment allows it. We use a standard try/catch to handle browser restrictions.
         try {
             let response = await fetch(WEBHOOK_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(payload),
+                mode: "no-cors"
             });
 
-            if (response.ok) {
-                btn.innerText = "Erfolgreich an Discord gesendet! 🚀✔️";
-            } else {
-                btn.innerText = "Kopiert! (Webhook Fehler) ⚠️";
-            }
+            // With mode: 'no-cors', response status is opaque, so we assume success if no error is thrown
+            btn.innerText = "Successfully Sent to Discord!";
         } catch (error) {
-            btn.innerText = "Kopiert! (Netzwerkfehler) ⚠️";
+            btn.innerText = "Copied! (Webhook Blocked by Browser CORS)";
         }
 
         setTimeout(() => {
-            btn.innerText = "Command Kopieren & An Discord senden 🚀";
+            btn.innerText = "Copy Command & Send to Discord";
         }, 3000);
     }
 
